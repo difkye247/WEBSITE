@@ -1,0 +1,1 @@
+简历 PDF 放这里，然后在 content.js 的 contact.resume 写 "files/文件名.pdf"

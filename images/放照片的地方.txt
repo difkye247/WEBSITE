@@ -1,0 +1,1 @@
+把照片放在这里，然后在 content.js 里写 "images/文件名.jpg"
