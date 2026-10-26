@@ -22,11 +22,24 @@ window.SITE = {
 
   /* ---------- 首页轮播大图 ----------
    * image: 背景照片（可以是 images/ 里的，也可以是网址）；不填就用 drawing 线稿
+   * model: "fpv" 显示可拖动的 3D 无人机模型
    * drawing: "frame" 机架线稿 / "" 不要线稿
+   * duration: 这一张停留几秒（默认 6 秒）
    * theme: "dark" 深色背景白字 / "light" 浅色背景黑字
    * links: 按钮。video 填 B 站 BV 号会弹出视频；href 填 "#parts" 之类跳到页面位置
    */
   hero: [
+    {
+      title: "5 寸竞速机架 V2",
+      tagline: "T700 碳板，机臂单独可换，可小批量供货",
+      model: "fpv",          // 3D 无人机模型（可拖动旋转）。不想要就删掉这一行，改成 drawing: "frame"
+      duration: 12,          // 这一张停留 12 秒
+      theme: "dark",
+      links: [
+        { text: "了解更多", part: "5 寸竞速机架 V2" },
+        { text: "咨询定制", href: "#contact" },
+      ],
+    },
     {
       title: "模块化光伏板清洗车",
       tagline: "产品设计作品：现场清洗作业与交付验收实录",
@@ -35,17 +48,6 @@ window.SITE = {
       links: [
         { text: "看工作实录", video: "BV1Sjn96XEcd" },
         { text: "看验收实录", video: "BV1Ujn96XEfv" },
-      ],
-    },
-    {
-      title: "5 寸竞速机架 V2",
-      tagline: "T700 碳板，机臂单独可换，可小批量供货",
-      image: "",
-      drawing: "frame",
-      theme: "dark",
-      links: [
-        { text: "了解更多", part: "5 寸竞速机架 V2" },
-        { text: "咨询定制", href: "#contact" },
       ],
     },
     {

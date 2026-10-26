@@ -215,7 +215,11 @@
       h.tagline ? el("p", { class: "tagline", text: h.tagline }) : null,
       (h.links || []).length ? el("div", { class: "links" }, h.links.map(linkFor)) : null,
     ];
-    if (!h.image && h.drawing === "frame") kids.push(el("div", { class: "slide-art", html: HERO_FRAME }));
+    var stage = null;
+    if (!h.image && h.model) {
+      stage = el("div", { class: "slide-3d" });
+      kids.push(stage, el("p", { class: "hint-3d", html: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 4 0 0 0 16 0M20 12a8 4 0 0 0-16 0"/><path d="M17 15.5l3-3.5 1 4"/></svg>按住拖动，360° 查看' }));
+    } else if (!h.image && h.drawing === "frame") kids.push(el("div", { class: "slide-art", html: HERO_FRAME }));
     if (!h.image && !h.drawing && theme === "light") {
       var facts = el("ul", { class: "intro-facts" }, (S.skills || []).map(function (s) { return el("li", { text: s.title }); }));
       if (S.status) facts.appendChild(el("li", { text: S.status }));
@@ -223,6 +227,12 @@
     }
     var s = el("div", { class: "slide " + theme + (theme === "dark" ? " on-dark" : ""), role: "group", "aria-roledescription": "slide", "aria-label": (i + 1) + " / " + heroData.length }, kids);
     slidesBox.appendChild(s);
+    s._dur = h.duration ? h.duration * 1000 : 6000;
+    if (stage) {
+      var v = window.Drone3D ? window.Drone3D.mount(stage, { onInteract: function () { setPaused(true); } }) : { ok: false };
+      if (v.ok) s._viewer = v;
+      else { stage.className = "slide-art"; stage.innerHTML = HERO_FRAME; var hn = s.querySelector(".hint-3d"); if (hn) hn.remove(); }
+    }
     return s;
   });
   var cur = 0, timer = null, paused = reduceMotion;
@@ -231,8 +241,13 @@
     slides.forEach(function (s, k) { s.classList.toggle("is-active", k === cur); s.setAttribute("aria-hidden", String(k !== cur)); s.inert = k !== cur; });
     dotsBox.querySelectorAll(".dot").forEach(function (d, k) { d.setAttribute("aria-current", String(k === cur)); });
     hero.classList.toggle("is-light", slides[cur].classList.contains("light"));
+    slides.forEach(function (s, k) { if (s._viewer) { if (k === cur) s._viewer.start(); else s._viewer.stop(); } });
   }
-  function schedule() { clearInterval(timer); if (!paused && slides.length > 1) timer = setInterval(function () { show(cur + 1); }, 6000); }
+  function stopTimer() { clearTimeout(timer); }
+  function schedule() {
+    stopTimer();
+    if (!paused && slides.length > 1) timer = setTimeout(function () { show(cur + 1); schedule(); }, slides[cur]._dur);
+  }
   slides.forEach(function (_, i) {
     dotsBox.appendChild(el("button", { type: "button", class: "dot", "aria-label": "第 " + (i + 1) + " 张", on: { click: function () { show(i); schedule(); } } }));
   });
@@ -241,12 +256,12 @@
     pauseBtn.setAttribute("aria-label", p ? "播放轮播" : "暂停轮播"); schedule();
   }
   pauseBtn.addEventListener("click", function () { setPaused(!paused); });
-  slidesBox.addEventListener("mouseenter", function () { clearInterval(timer); });
+  slidesBox.addEventListener("mouseenter", stopTimer);
   slidesBox.addEventListener("mouseleave", schedule);
-  slidesBox.addEventListener("focusin", function () { clearInterval(timer); });
+  slidesBox.addEventListener("focusin", stopTimer);
   slidesBox.addEventListener("focusout", schedule);
   var x0 = null;
-  slidesBox.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+  slidesBox.addEventListener("touchstart", function (e) { x0 = e.target.tagName === "CANVAS" ? null : e.touches[0].clientX; }, { passive: true });
   slidesBox.addEventListener("touchend", function (e) {
     if (x0 === null) return; var dx = e.changedTouches[0].clientX - x0; x0 = null;
     if (Math.abs(dx) > 50) { show(cur + (dx < 0 ? 1 : -1)); schedule(); }
