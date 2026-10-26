@@ -218,20 +218,31 @@
     var stage = null;
     if (!h.image && h.model) {
       stage = el("div", { class: "slide-3d" });
-      kids.push(stage, el("p", { class: "hint-3d", html: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 4 0 0 0 16 0M20 12a8 4 0 0 0-16 0"/><path d="M17 15.5l3-3.5 1 4"/></svg>按住拖动，360° 查看' }));
+      var exBtn = el("button", { type: "button", class: "explode-btn", "aria-pressed": "false",
+        html: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v5M12 16v5M5 12H3M21 12h-2"/><rect x="8" y="9" width="8" height="6" rx="1.5"/></svg><span>拆解视图</span>' });
+      kids.push(stage, el("div", { class: "ctrl-3d" }, [
+        el("p", { class: "hint-3d", html: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 4 0 0 0 16 0M20 12a8 4 0 0 0-16 0"/><path d="M17 15.5l3-3.5 1 4"/></svg>按住拖动，360° 查看' }),
+        exBtn,
+      ]));
     } else if (!h.image && h.drawing === "frame") kids.push(el("div", { class: "slide-art", html: HERO_FRAME }));
     if (!h.image && !h.drawing && theme === "light") {
       var facts = el("ul", { class: "intro-facts" }, (S.skills || []).map(function (s) { return el("li", { text: s.title }); }));
       if (S.status) facts.appendChild(el("li", { text: S.status }));
       kids.push(el("div", { class: "intro-art" }, [facts]));
     }
-    var s = el("div", { class: "slide " + theme + (theme === "dark" ? " on-dark" : ""), role: "group", "aria-roledescription": "slide", "aria-label": (i + 1) + " / " + heroData.length }, kids);
+    var s = el("div", { class: "slide " + theme + (theme === "dark" ? " on-dark" : "") + (stage ? " has-3d" : ""), role: "group", "aria-roledescription": "slide", "aria-label": (i + 1) + " / " + heroData.length }, kids);
     slidesBox.appendChild(s);
     s._dur = h.duration ? h.duration * 1000 : 6000;
     if (stage) {
       var v = window.Drone3D ? window.Drone3D.mount(stage, { onInteract: function () { setPaused(true); } }) : { ok: false };
-      if (v.ok) s._viewer = v;
-      else { stage.className = "slide-art"; stage.innerHTML = HERO_FRAME; var hn = s.querySelector(".hint-3d"); if (hn) hn.remove(); }
+      if (v.ok) {
+        s._viewer = v;
+        exBtn.addEventListener("click", function () {
+          var on = !v.isExploded(); v.setExploded(on); setPaused(true);
+          exBtn.setAttribute("aria-pressed", String(on));
+          exBtn.querySelector("span").textContent = on ? "组装还原" : "拆解视图";
+        });
+      } else { stage.className = "slide-art"; stage.innerHTML = HERO_FRAME; var cn = s.querySelector(".ctrl-3d"); if (cn) cn.remove(); }
     }
     return s;
   });

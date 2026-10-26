@@ -97,6 +97,7 @@ body.locked { overflow: hidden; }
 }
 .slide.is-active { opacity: 1; visibility: visible; transition: opacity .8s ease, visibility 0s; z-index: 1; }
 .slide.dark { background: radial-gradient(120% 90% at 50% 100%, #2A2F35 0%, #121417 55%, #000 100%); color: var(--on-dark); }
+.slide.dark.has-3d { background: radial-gradient(90% 70% at 50% 62%, #16181B 0%, #050506 60%, #000 100%); }
 .slide.light { background: linear-gradient(180deg, #F7F8FA 0%, #E9ECEF 100%); color: var(--ink); }
 .slide-bg { position: absolute; inset: 0; z-index: -1; }
 .slide-bg img { width: 100%; height: 100%; object-fit: cover; }
@@ -121,13 +122,20 @@ body.locked { overflow: hidden; }
 .slide-3d.grabbing { cursor: grabbing; }
 .slide-3d canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; outline: none; }
 .slide-3d canvas:focus-visible { outline: 2px solid #5AA9FF; outline-offset: -2px; border-radius: 8px; }
-.hint-3d {
-  position: absolute; left: 50%; bottom: 64px; translate: -50% 0; z-index: 2; pointer-events: none;
-  display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
-  font-size: 13px; color: var(--on-dark-muted); background: rgba(255,255,255,.08);
-  padding: 6px 14px; border-radius: 999px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+.ctrl-3d {
+  position: absolute; left: 50%; bottom: 64px; translate: -50% 0; z-index: 2;
+  display: flex; align-items: center; gap: 10px; white-space: nowrap;
 }
-.hint-3d svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+.hint-3d, .explode-btn {
+  display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px; border-radius: 999px;
+  font-size: 13px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.hint-3d { color: var(--on-dark-muted); background: rgba(255,255,255,.07); pointer-events: none; }
+.explode-btn { color: #fff; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.22); cursor: pointer; font-family: inherit; }
+.explode-btn:hover { background: rgba(255,255,255,.22); }
+.explode-btn[aria-pressed="true"] { background: #fff; color: #111; border-color: #fff; }
+.hint-3d svg, .explode-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+@media (max-width: 560px) { .hint-3d { display: none; } }
 
 /* 介绍页的大字 */
 .intro-art { flex: 1; display: flex; align-items: center; justify-content: center; padding-bottom: 72px; }
